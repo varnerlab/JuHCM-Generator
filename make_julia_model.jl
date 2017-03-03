@@ -9,8 +9,13 @@ function parse_commandline()
         arg_type = AbstractString
         default = "."
 
+      "-n"
+        help = "Path to the biochemical reaction file written in the vff-reaction format."
+        arg_type = AbstractString
+        required = true
+
       "-m"
-        help = "Path to the biochemical reaction file written in the vff format."
+        help = "Path to the flux model file written in the vff-mode format."
         arg_type = AbstractString
         required = true
     end
@@ -31,11 +36,15 @@ function main()
   component_set = Set{ProgramComponent}()
 
   # Load the statement_vector -
-  path_to_model_file = parsed_args["m"]
+  path_to_model_file = parsed_args["n"]
   metabolic_statement_vector::Array{VFFSentence} = parse_vff_metabolic_statements(path_to_model_file)
 
+  # load the flux model statement vector -
+  path_to_flux_mode_file = parsed_args["m"]
+  flux_mode_statement_vector::Array{VFFFluxModeSentence} = parse_vff_flux_mode_statements(path_to_flux_mode_file)
+
   # Generate the problem object -
-  problem_object = generate_problem_object(metabolic_statement_vector,config_dict)
+  problem_object = generate_problem_object(metabolic_statement_vector,flux_mode_statement_vector,config_dict)
   problem_object.configuration_dictionary = config_dict
 
   # Write the stoichiometric_matrix --

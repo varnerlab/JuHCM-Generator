@@ -25,7 +25,7 @@
 # ----------------------------------------------------------------------------------- #
 # Function: Kinetics
 # Description: Calculate the flux array at time t
-# Generated on: 2017-03-03T07:00:55.989
+# Generated on: 2017-03-03T14:36:18.888
 #
 # Input arguments:
 # t::Float64 => Current time value (scalar) 
@@ -39,9 +39,28 @@ function Kinetics(time,state_array,data_dictionary)
 
 	# Get data/parameters from the data_dictionary - 
 	flux_balance_modes_matrix = data_dictionary["flux_balance_modes_matrix"]
-	(number_of_reactions,number_of_modes) = size(flux_balance_modes_matrix)
+	K = data_dictionary["saturation_constant_array"]
+	VMax = data_dictionary["rate_constant_array"]
 
 	# initialize the kinetic_rate_array - 
+	(number_of_reactions,number_of_modes) = size(flux_balance_modes_matrix)
 	kinetic_rate_array = zeros(number_of_modes)
+
+	# alias the state_array - 
+	E_M1 = state_array[1]
+	E_M2 = state_array[2]
+	E_M3 = state_array[3]
+	E_M4 = state_array[4]
+
+	A_e = state_array[5]
+	B_e = state_array[6]
+	C_e = state_array[7]
+
+	# build the kinetic rates - 
+	kinetic_rate_array[1] = VMax[1]*E_M1*(A_e/(K[1]+A_e))
+	kinetic_rate_array[2] = VMax[2]*E_M2*(C_e/(K[2]+C_e))
+	kinetic_rate_array[3] = VMax[3]*E_M3*(A_e/(K[3]+A_e))*(C_e/(K[4]+C_e))
+	kinetic_rate_array[4] = VMax[4]*E_M4*(A_e/(K[5]+A_e))
+
 	return kinetic_rate_array
 end

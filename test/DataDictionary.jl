@@ -25,48 +25,69 @@
 # ----------------------------------------------------------------------------------- #
 # Function: DataDictionary
 # Description: Holds simulation and model parameters as key => value pairs in a Julia Dict()
-# Generated on: 2017-03-03T07:00:56.023
+# Generated on: 2017-03-03T14:36:18.936
 #
 # Input arguments:
-# time_start::Float64 => Simulation start time value (scalar) 
-# time_stop::Float64 => Simulation stop time value (scalar) 
-# time_step::Float64 => Simulation time step (scalar) 
+# time_start::Float64 => Simulation start time value (scalar)
+# time_stop::Float64 => Simulation stop time value (scalar)
+# time_step::Float64 => Simulation time step (scalar)
 #
 # Output arguments:
-# data_dictionary::Dict{AbstractString,Any} => Dictionary holding model and simulation parameters as key => value pairs 
+# data_dictionary::Dict{AbstractString,Any} => Dictionary holding model and simulation parameters as key => value pairs
 # ----------------------------------------------------------------------------------- #
 function DataDictionary(time_start,time_stop,time_step)
 
-	# Load the networks from disk - 
+	# Load the networks from disk -
 	stoichiometric_matrix = readdlm("Network.dat");
 	flux_balance_modes_matrix = readdlm("Modes.dat");
 
-	# How many modes do we have? - 
+	# How many modes do we have? -
 	(number_of_reactions,number_of_modes) = size(flux_balance_modes_matrix)
 
-	# Setup the initial_condition_array - 
-	enzyme_initial_conditions = ones(number_of_modes)
-	initial_condition_array = [
-		enzyme_initial_conditions	;	# enzymes
-		0.0	;	# 1 A_e
-		0.0	;	# 2 B_e
-		0.0	;	# 3 C_e
-	]
-
-	# Setup the index_vector_external_species - 
+	# Setup the index_vector_external_species -
 	index_vector_external_species = [
 		4	;	# 1 A_e
 		5	;	# 2 B_e
 		6	;	# 3 C_e
 	]
 
-	# Setup the degradation_constant_array - 
-	default_protein_half_life = 24.0	# units:hr
-	default_degrdation_constant = -(1/protein_half_life)*log(0.5)	# units: hr^-1
-	degradation_constant_array = default_degrdation_constant*ones(number_of_modes)
+	# Setup the initial_condition_array -
+	initial_condition_array = [
 
-	# Setup the external stoichiometric matrix - 
+		1.0	;	# 1 E_M1
+		1.0	;	# 2 E_M2
+		1.0	;	# 3 E_M3
+		1.0	;	# 4 E_M4
+
+		0.0	;	# 5 A_e
+		0.0	;	# 6 B_e
+		0.0	;	# 7 C_e
+	]
+
+	# Setup the rate constant array -
+	rate_constant_array = [
+		1.0	;	# Mode-1
+		1.0	;	# Mode-2
+		1.0	;	# Mode-3
+		1.0	;	# Mode-4
+	]
+
+	# Setup the saturation_constant_array -
+	saturation_constant_array = [
+		1.0	;	# 1 M1 A_e K[1]
+		1.0	;	# 2 M2 C_e K[2]
+		1.0	;	# 3 M3 A_e K[3]
+		1.0	;	# 3 M3 C_e K[4]
+		1.0	;	# 4 M4 A_e K[5]
+	]
+
+	# Setup the external stoichiometric matrix -
 	external_stoichiometric_matrix = stoichiometric_matrix[index_vector_external_species,:]
+
+	# Setup the degradation_constant_array -
+	default_protein_half_life = 24.0	# units:hr
+	default_degrdation_constant = -(1/default_protein_half_life)*log(0.5)	# units: hr^-1
+	degradation_constant_array = default_degrdation_constant*ones(number_of_modes)
 
 	# =============================== DO NOT EDIT BELOW THIS LINE ============================== #
 	data_dictionary = Dict{AbstractString,Any}()
@@ -76,6 +97,8 @@ function DataDictionary(time_start,time_stop,time_step)
 	data_dictionary["degradation_constant_array"] = degradation_constant_array
 	data_dictionary["flux_balance_modes_matrix"] = flux_balance_modes_matrix
 	data_dictionary["index_vector_external_species"] = index_vector_external_species
+	data_dictionary["saturation_constant_array"] = saturation_constant_array
+	data_dictionary["rate_constant_array"] = rate_constant_array
 	# =============================== DO NOT EDIT ABOVE THIS LINE ============================== #
 	return data_dictionary
 end

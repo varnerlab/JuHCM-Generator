@@ -1,4 +1,4 @@
-function generate_problem_object(metabolic_statement_vector::Array{VFFSentence},configuration_dictionary::Dict{String,Any})
+function generate_problem_object(metabolic_statement_vector::Array{VFFSentence},flux_mode_statement_vector::Array{VFFFluxModeSentence},configuration_dictionary::Dict{String,Any})
 
   # Initilize an empty problem object -
   problem_object::ProblemObject = ProblemObject()
@@ -18,6 +18,7 @@ function generate_problem_object(metabolic_statement_vector::Array{VFFSentence},
   # set data on problem_object -
   problem_object.list_of_species = species_array
   problem_object.list_of_reactions = reaction_array
+  problem_object.list_of_flux_modes = flux_mode_statement_vector
 
   # return#the problem_object -
   return problem_object

@@ -46,7 +46,7 @@ function SolveBalances(time_start::Float64,time_stop::Float64,time_step_size::Fl
   initial_condition_array = data_dictionary["initial_condition_array"]
 
   # Run the ODE solver -
-  f(t,x,dxdt) = Balances(t,x,dxdt,DF)
+  f(t,x,dxdt) = Balances(t,x,dxdt,data_dictionary)
   state_array = Sundials.cvode(f,initial_condition_array,time_array,reltol=1e-3,abstol=1e-6,integrator=:BDF)
 
   # return -

@@ -152,13 +152,68 @@ function build_kinetics_buffer(problem_object::ProblemObject)
   buffer *= "\n"
   buffer *= "\t# Get data/parameters from the data_dictionary - \n"
   buffer *= "\tflux_balance_modes_matrix = data_dictionary[\"flux_balance_modes_matrix\"]\n"
-  buffer *= "\t(number_of_reactions,number_of_modes) = size(flux_balance_modes_matrix)\n"
+  buffer *= "\tK = data_dictionary[\"saturation_constant_array\"]\n"
+  buffer *= "\tVMax = data_dictionary[\"rate_constant_array\"]\n"
+
 
   # initialize -
   buffer *= "\n"
   buffer *= "\t# initialize the kinetic_rate_array - \n"
+  buffer *= "\t(number_of_reactions,number_of_modes) = size(flux_balance_modes_matrix)\n"
   buffer *= "\tkinetic_rate_array = zeros(number_of_modes)\n"
-  
+
+  # alias the model species -
+  buffer *= "\n"
+  buffer *= "\t# alias the state_array - \n"
+
+  # get my modes -
+  list_of_flux_modes::Array{VFFFluxModeSentence} = problem_object.list_of_flux_modes
+  counter = 1
+  for (index,flux_mode_object) in enumerate(list_of_flux_modes)
+
+    # get name of mode -
+    mode_name = flux_mode_object.sentence_name
+    buffer *= "\tE_$(mode_name) = state_array[$(counter)]\n"
+    counter = counter+1
+  end
+
+  buffer *="\n"
+
+  list_of_species::Array{SpeciesObject} = problem_object.list_of_species
+  for (index,species_object) in enumerate(list_of_species)
+
+    # Get the bound type, and species -
+    species_bound_type = species_object.species_bound_type
+    species_symbol = species_object.species_symbol
+
+    if (species_bound_type == :unbalanced)
+      buffer *= "\t$species_symbol = state_array[$(counter)]\n"
+      counter = counter + 1
+    end
+  end
+
+  # ok, now lets build the kinetics -
+  buffer *="\n"
+  buffer *= "\t# build the kinetic rates - \n"
+  saturation_constant_counter = 1
+  for (index,flux_mode_object) in enumerate(list_of_flux_modes)
+
+    # get the mode name -
+    mode_name = flux_mode_object.sentence_name
+
+    # start the reaction -
+    buffer *= "\tkinetic_rate_array[$(index)] = VMax[$(index)]*E_$(mode_name)"
+
+    # now .. go thru the species list -
+    list_of_species_symbols::Array{String} = flux_mode_object.species_symbol_array
+    for (species_index,species_symbol) in enumerate(list_of_species_symbols)
+      buffer *= "*($(species_symbol)/(K[$(saturation_constant_counter)]+$(species_symbol)))"
+      saturation_constant_counter = saturation_constant_counter + 1
+    end
+
+    buffer *= "\n"
+  end
+
   buffer *= "\n"
   buffer *= "\treturn kinetic_rate_array\n"
   buffer *= "end\n"
@@ -183,6 +238,8 @@ function build_data_dictionary_buffer(problem_object::ProblemObject)
   comment_header_dictionary = problem_object.configuration_dictionary["function_comment_dictionary"]["data_dictionary_function"]
   function_comment_buffer = build_function_header_buffer(comment_header_dictionary)
 
+
+
   # Get the default -
   # default_parameter_dictionary = problem_object.configuration_dictionary["default_parameter_dictionary"]
   # enzyme_initial_condition = parse(Float64,default_parameter_dictionary["default_protein_initial_condition"])
@@ -204,28 +261,9 @@ function build_data_dictionary_buffer(problem_object::ProblemObject)
   buffer *= "\t# How many modes do we have? - \n"
   buffer *= "\t(number_of_reactions,number_of_modes) = size(flux_balance_modes_matrix)\n"
 
-  # setup initial condition array -
-  buffer *= "\n"
-  buffer *= "\t# Setup the initial_condition_array - \n"
-  buffer *= "\tenzyme_initial_conditions = ones(number_of_modes)\n"
-  buffer *= "\tinitial_condition_array = [\n"
-  buffer *= "\t\tenzyme_initial_conditions\t;\t# enzymes\n"
-
+  # Get list of species -
   list_of_species::Array{SpeciesObject} = problem_object.list_of_species
-  counter = 1
-  for (index,species_object) in enumerate(list_of_species)
-
-    # Get the bound type, and species -
-    species_bound_type = species_object.species_bound_type
-    species_symbol = species_object.species_symbol
-
-    if (species_bound_type == :unbalanced)
-      buffer *= "\t\t0.0\t;\t# $(counter) $(species_symbol)\n"
-      counter = counter + 1
-    end
-  end
-
-  buffer *= "\t]\n"
+  list_of_flux_modes::Array{VFFFluxModeSentence} = problem_object.list_of_flux_modes
 
   # setup the indexes of external species -
   buffer *= "\n"
@@ -245,17 +283,83 @@ function build_data_dictionary_buffer(problem_object::ProblemObject)
   end
   buffer *= "\t]\n"
 
-  # setup the degrdation constant array -
+
+  # setup initial condition array -
   buffer *= "\n"
-  buffer *= "\t# Setup the degradation_constant_array - \n"
-  buffer *= "\tdefault_protein_half_life = 24.0\t# units:hr\n"
-  buffer *= "\tdefault_degrdation_constant = -(1/protein_half_life)*log(0.5)\t# units: hr^-1\n"
-  buffer *= "\tdegradation_constant_array = default_degrdation_constant*ones(number_of_modes)\n"
+  buffer *= "\t# Setup the initial_condition_array - \n"
+  buffer *= "\tinitial_condition_array = [\n"
+  buffer *= "\n"
+
+  # get my modes -
+  counter = 1
+  for (index,flux_mode_object) in enumerate(list_of_flux_modes)
+
+    # get name of mode -
+    mode_name = flux_mode_object.sentence_name
+    buffer *= "\t\t0.0\t;\t# $(counter) E_$(mode_name)\n"
+    counter = counter+1
+  end
+
+  buffer *="\n"
+  for (index,species_object) in enumerate(list_of_species)
+
+    # Get the bound type, and species -
+    species_bound_type = species_object.species_bound_type
+    species_symbol = species_object.species_symbol
+
+    if (species_bound_type == :unbalanced)
+      buffer *= "\t\t0.0\t;\t# $(counter) $(species_symbol)\n"
+      counter = counter + 1
+    end
+  end
+
+  buffer *= "\t]\n"
+
+  # setup the rate constant array -
+  buffer *= "\n"
+  buffer *= "\t# Setup the rate constant array - \n"
+  buffer *= "\trate_constant_array = [\n"
+
+  for (index,flux_mode_object) in enumerate(list_of_flux_modes)
+
+    # get the mode name -
+    mode_name = flux_mode_object.sentence_name
+
+    # start the reaction -
+    buffer *= "\t\t0.0\t;\t# Mode-$(index)\n"
+  end
+  buffer *= "\t]\n"
+
+  # setup the saturation_constant_array -
+  saturation_constant_counter = 1
+  buffer *= "\n"
+  buffer *= "\t# Setup the saturation_constant_array - \n"
+  buffer *= "\tsaturation_constant_array = [\n"
+  for (index,flux_mode_object) in enumerate(list_of_flux_modes)
+
+    # get the mode name -
+    mode_name = flux_mode_object.sentence_name
+
+    # now .. go thru the species list -
+    list_of_species_symbols::Array{String} = flux_mode_object.species_symbol_array
+    for (species_index,species_symbol) in enumerate(list_of_species_symbols)
+      buffer *= "\t\t1.0\t;\t# $(index) $(mode_name) $(species_symbol) K[$(saturation_constant_counter)]\n"
+      saturation_constant_counter = saturation_constant_counter + 1
+    end
+  end
+  buffer *= "\t]\n"
 
   # setup the external stoichiometric_matrix -
   buffer *= "\n"
   buffer *= "\t# Setup the external stoichiometric matrix - \n"
   buffer *= "\texternal_stoichiometric_matrix = stoichiometric_matrix[index_vector_external_species,:]\n"
+
+  # setup the degrdation constant array -
+  buffer *= "\n"
+  buffer *= "\t# Setup the degradation_constant_array - \n"
+  buffer *= "\tdefault_protein_half_life = 24.0\t# units:hr\n"
+  buffer *= "\tdefault_degrdation_constant = -(1/default_protein_half_life)*log(0.5)\t# units: hr^-1\n"
+  buffer *= "\tdegradation_constant_array = default_degrdation_constant*ones(number_of_modes)\n"
 
   # return block -
   buffer *= "\n"
@@ -267,6 +371,8 @@ function build_data_dictionary_buffer(problem_object::ProblemObject)
   buffer *= "\tdata_dictionary[\"degradation_constant_array\"] = degradation_constant_array\n"
   buffer *= "\tdata_dictionary[\"flux_balance_modes_matrix\"] = flux_balance_modes_matrix\n"
   buffer *= "\tdata_dictionary[\"index_vector_external_species\"] = index_vector_external_species\n"
+  buffer *= "\tdata_dictionary[\"saturation_constant_array\"] = saturation_constant_array\n"
+  buffer *= "\tdata_dictionary[\"rate_constant_array\"] = rate_constant_array\n"
   buffer *= "\t# =============================== DO NOT EDIT ABOVE THIS LINE ============================== #\n"
   buffer *= "\treturn data_dictionary\n"
   buffer *= "end\n"

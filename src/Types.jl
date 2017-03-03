@@ -1,4 +1,16 @@
 
+type VFFFluxModeSentence
+
+  original_sentence::AbstractString
+  sentence_name::AbstractString
+  species_symbol_array::Array{String}
+
+  function VFFFluxModeSentence()
+    this = new()
+  end
+
+end
+
 type VFFSentence
 
   original_sentence::AbstractString
@@ -63,6 +75,7 @@ type ProblemObject
   configuration_dictionary::Dict{AbstractString,Any}
   list_of_species::Array{SpeciesObject}
   list_of_reactions::Array{ReactionObject}
+  list_of_flux_modes::Array{VFFFluxModeSentence}
 
   function ProblemObject()
     this = new()

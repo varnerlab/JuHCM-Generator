@@ -47,6 +47,37 @@ function parse_vff_measured_species_statements(path_to_model_file::AbstractStrin
   return measured_species_vector
 end
 
+function parse_vff_flux_mode_statements(path_to_flux_mode_file::AbstractString)
+
+  # Create an array of mode sentences -
+  sentence_vector = VFFFluxModeSentence[]
+  tmp_array::Array{AbstractString} = AbstractString[]
+
+  # open the file -
+  try
+
+    # Open the model file, and read each line into a vector -
+    open(path_to_flux_mode_file,"r") do model_file
+      for line in eachline(model_file)
+
+          if (contains(line,"//") == false && search(line,"\n")[1] != 1)
+            push!(tmp_array,chomp(line))
+          end
+      end
+    end
+
+    for sentence in tmp_array
+
+      vff_flux_model_sentence = vff_flux_mode_sentence_factory(sentence)
+      push!(sentence_vector,vff_flux_model_sentence)
+    end
+
+  catch err
+    showerror(STDOUT, err, backtrace());println()
+  end
+
+  return sentence_vector
+end
 
 function parse_vff_metabolic_statements(path_to_model_file::AbstractString)
 
@@ -115,6 +146,32 @@ function extract_vff_handler_symbol(sentence::String)
 
   return handler_symbol
 
+end
+
+function vff_flux_mode_sentence_factory(sentence::String)
+
+  vff_flux_model_sentence = VFFFluxModeSentence()
+  vff_flux_model_sentence.original_sentence = sentence
+
+  @show sentence
+
+  # split the sentence -
+  split_array = split(sentence,",")
+  metabolite_source_array = String[]
+  for (index,token) in enumerate(split_array)
+
+    if (index == 1)
+      vff_flux_model_sentence.sentence_name = token
+    else
+      push!(metabolite_source_array,token)
+    end
+  end
+
+  # grab the array -
+  vff_flux_model_sentence.species_symbol_array = metabolite_source_array
+
+  # return -
+  return vff_flux_model_sentence
 end
 
 function vff_metabolic_sentence_factory(sentence::String,handler_symbol::Symbol)

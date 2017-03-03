@@ -29,7 +29,7 @@ function Balances(time::Float64,state_array::Array{Float64,1},dxdt_vector::Array
 
   # get parameters fron the data dictionary -
   beta = data_dictionary["degradation_constant_array"]
-  mode_matrix = data_dictionary["flux_balance_mode_matrix"]
+  mode_matrix = data_dictionary["flux_balance_modes_matrix"]
   stoichiometric_matrix = data_dictionary["external_stoichiometric_matrix"]
 
   # what is my system size?

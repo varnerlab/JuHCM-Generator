@@ -44,7 +44,7 @@ function Control(time::Float64,state_array::Array{Float64,1},kinetic_rate_array:
   # Initialize cybernetic variables u and v -
   v = zeros(number_of_modes)
   for mode_index = 1:number_of_modes
-    v[mode_index] = cybernetic_variable_array[i]/maximum_rate
+    v[mode_index] = cybernetic_variable_array[mode_index]/maximum_rate
   end
 
   # return the cybernetic v-variable -

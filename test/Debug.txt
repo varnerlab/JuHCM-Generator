@@ -1,0 +1,17 @@
+1 R1::A --> B
+2 R2::A --> C
+3 R3::C --> B
+4 R4::B --> A
+5 E1::A_e --> A
+6 E1_reverse::A --> A_e
+7 E2::B_e --> B
+8 E2_reverse::B --> B_e
+9 E3::C_e --> C
+10 E3_reverse::C --> C_e
+
+1 A
+2 B
+3 C
+4 A_e
+5 B_e
+6 C_e

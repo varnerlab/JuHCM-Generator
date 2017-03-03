@@ -1,0 +1,122 @@
+{
+
+  "default_parameter_dictionary":{
+    "default_protein_half_life":"300",
+    "default_protein_initial_condition":"0.0004",
+    "default_saturation_constant":"20.0",
+    "default_enzyme_kcat":"25000.0",
+    "default_background_expression_parameter":"0.001",
+    "default_TF_KD_parameter":"120.0"
+  },
+
+  "default_user_dictionary":{
+    "default_username":"varnerlab",
+    "default_company_name":"Cornell University",
+    "default_department_name":"Chemical and Biomolecular Engineering",
+    "default_street_address":"120 Olin Hall",
+    "default_city_address":"Ithaca",
+    "default_state_address":"NY",
+    "default_zipcode":"14850"
+  },
+
+  "list_of_induction_synonyms":[
+    {
+      "symbol":"activate"
+    },
+    {
+      "symbol":"activates"
+    },
+    {
+      "symbol":"activated"
+    },
+    {
+      "symbol":"induce"
+    },
+    {
+      "symbol":"induces"
+    },
+    {
+      "symbol":"induced"
+    }
+  ],
+
+  "list_of_repression_synonyms":[
+    {
+      "symbol":"inhibit"
+    },
+    {
+      "symbol":"inhibits"
+    },
+    {
+      "symbol":"inhibited"
+    },
+    {
+      "symbol":"represses"
+    },
+    {
+      "symbol":"repressed"
+    },
+    {
+      "symbol":"repress"
+    }
+  ],
+
+  "unbalanced_species_suffix":{
+    "symbol":"_e"
+  },
+
+  "function_comment_dictionary":{
+
+    "kinetics_function":{
+
+      "function_name":"Kinetics",
+      "function_description":"Calculate the flux array at time t",
+
+      "input_args":[{
+          "symbol":"t::Float64",
+          "description":"Current time value (scalar)"
+        },
+        {
+          "symbol":"x::Array{Float64,1}",
+          "description":"State array (number_of_species x 1)"
+        },
+        {
+          "symbol":"data_dictionary::Dict{AbstractString,Any}",
+          "description":"Dictionary holding model parameters"
+        }
+      ],
+      "output_args":[
+        {
+          "symbol":"flux_array::Array{Float64,1}",
+          "description":"Flux array (number_of_rates x 1) at time t"
+        }
+      ]
+    },
+
+    "data_dictionary_function":{
+
+      "function_name":"DataDictionary",
+      "function_description":"Holds simulation and model parameters as key => value pairs in a Julia Dict()",
+
+      "input_args":[{
+          "symbol":"time_start::Float64",
+          "description":"Simulation start time value (scalar)"
+        },
+        {
+          "symbol":"time_stop::Float64",
+          "description":"Simulation stop time value (scalar)"
+        },
+        {
+          "symbol":"time_step::Float64",
+          "description":"Simulation time step (scalar)"
+        }
+      ],
+      "output_args":[
+        {
+          "symbol":"data_dictionary::Dict{AbstractString,Any}",
+          "description":"Dictionary holding model and simulation parameters as key => value pairs"
+        }
+      ]
+    }
+  }
+}

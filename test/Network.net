@@ -1,0 +1,10 @@
+// main -
+R1,A,B,0,inf
+R2,A,C,0,inf
+R3,C,B,0,inf
+R4,B,A,0,inf
+
+// exchange -
+E1,A_e,A,-inf,inf
+E2,B_e,B,-inf,inf
+E3,C_e,C,-inf,inf

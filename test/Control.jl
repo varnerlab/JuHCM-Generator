@@ -28,14 +28,18 @@ function Control(time::Float64,state_array::Array{Float64,1},kinetic_rate_array:
 
   # Get the mode_matrix
   mode_matrix = data_dictionary["flux_balance_modes_matrix"]
+  uptake_pivot_array = data_dictionary["uptake_pivot_array"]
   (number_of_reactions,number_of_modes) = size(mode_matrix)
 
   # Calculate the cybernetic_Variables
   fill!(cybernetic_variable_array,0.0)
   for mode_index = 1:number_of_modes
 
+    # what is the first non-zero element?
+    scale_factor = uptake_pivot_array[mode_index]
+
     # create the 'cybernetic' set -
-    push!(cybernetic_variable_array,mode_matrix[1,mode_index]*kinetic_rate_array[mode_index])
+    push!(cybernetic_variable_array,scale_factor*kinetic_rate_array[mode_index])
   end
 
   # what is ths maximum rate?

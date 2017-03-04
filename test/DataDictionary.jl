@@ -25,7 +25,7 @@
 # ----------------------------------------------------------------------------------- #
 # Function: DataDictionary
 # Description: Holds simulation and model parameters as key => value pairs in a Julia Dict()
-# Generated on: 2017-03-03T14:36:18.936
+# Generated on: 2017-03-03T20:52:45.152
 #
 # Input arguments:
 # time_start::Float64 => Simulation start time value (scalar)
@@ -51,6 +51,14 @@ function DataDictionary(time_start,time_stop,time_step)
 		6	;	# 3 C_e
 	]
 
+	# Setup the uptake_pivot_array -
+	uptake_pivot_array = [
+		5	;
+		9	;
+		5	;
+		5	;
+	]
+
 	# Setup the initial_condition_array -
 	initial_condition_array = [
 
@@ -61,7 +69,7 @@ function DataDictionary(time_start,time_stop,time_step)
 
 		0.0	;	# 5 A_e
 		0.0	;	# 6 B_e
-		0.0	;	# 7 C_e
+		10.0	;	# 7 C_e
 	]
 
 	# Setup the rate constant array -
@@ -99,6 +107,7 @@ function DataDictionary(time_start,time_stop,time_step)
 	data_dictionary["index_vector_external_species"] = index_vector_external_species
 	data_dictionary["saturation_constant_array"] = saturation_constant_array
 	data_dictionary["rate_constant_array"] = rate_constant_array
+	data_dictionary["uptake_pivot_array"] = uptake_pivot_array
 	# =============================== DO NOT EDIT ABOVE THIS LINE ============================== #
 	return data_dictionary
 end

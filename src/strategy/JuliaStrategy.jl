@@ -283,6 +283,14 @@ function build_data_dictionary_buffer(problem_object::ProblemObject)
   end
   buffer *= "\t]\n"
 
+  buffer *= "\n"
+  buffer *= "\t# Setup the uptake_pivot_array - \n"
+  buffer *= "\tuptake_pivot_array = [\n"
+  for (index,flux_mode_object) in enumerate(list_of_flux_modes)
+    buffer *= "\t\t$(flux_mode_object.pivot_index)\t;\n"
+  end
+
+  buffer *= "\t]\n"
 
   # setup initial condition array -
   buffer *= "\n"
@@ -373,6 +381,7 @@ function build_data_dictionary_buffer(problem_object::ProblemObject)
   buffer *= "\tdata_dictionary[\"index_vector_external_species\"] = index_vector_external_species\n"
   buffer *= "\tdata_dictionary[\"saturation_constant_array\"] = saturation_constant_array\n"
   buffer *= "\tdata_dictionary[\"rate_constant_array\"] = rate_constant_array\n"
+  buffer *= "\tdata_dictionary[\"uptake_pivot_array\"] = uptake_pivot_array\n"
   buffer *= "\t# =============================== DO NOT EDIT ABOVE THIS LINE ============================== #\n"
   buffer *= "\treturn data_dictionary\n"
   buffer *= "end\n"

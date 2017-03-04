@@ -7,3 +7,4 @@ include("SolveBalances.jl")
 
 # we are using SUNDIALS to solve the balances -
 using Sundials
+using PyPlot

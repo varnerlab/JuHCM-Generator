@@ -4,6 +4,7 @@ type VFFFluxModeSentence
   original_sentence::AbstractString
   sentence_name::AbstractString
   species_symbol_array::Array{String}
+  pivot_index::Int
 
   function VFFFluxModeSentence()
     this = new()

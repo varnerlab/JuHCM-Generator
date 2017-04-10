@@ -164,6 +164,8 @@ function vff_flux_mode_sentence_factory(sentence::String)
       vff_flux_model_sentence.sentence_name = token
     elseif (index == 2)
       vff_flux_model_sentence.pivot_index = parse(Int64,token)
+    elseif (index == 3)
+      vff_flux_model_sentence.sentence_comment = token
     else
       push!(metabolite_source_array,token)
     end

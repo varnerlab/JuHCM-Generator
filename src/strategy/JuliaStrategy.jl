@@ -287,7 +287,8 @@ function build_data_dictionary_buffer(problem_object::ProblemObject)
   buffer *= "\t# Setup the uptake_pivot_array - \n"
   buffer *= "\tuptake_pivot_array = [\n"
   for (index,flux_mode_object) in enumerate(list_of_flux_modes)
-    buffer *= "\t\t$(flux_mode_object.pivot_index)\t;\n"
+    comment_string = flux_mode_object.sentence_comment
+    buffer *= "\t\t$(flux_mode_object.pivot_index)\t;\t# $(comment_string)\n"
   end
 
   buffer *= "\t]\n"
@@ -304,7 +305,9 @@ function build_data_dictionary_buffer(problem_object::ProblemObject)
 
     # get name of mode -
     mode_name = flux_mode_object.sentence_name
-    buffer *= "\t\t0.0\t;\t# $(counter) E_$(mode_name)\n"
+    mode_comment = flux_mode_object.sentence_comment
+
+    buffer *= "\t\t0.0\t;\t# $(counter) E_$(mode_name) $(mode_comment)\n"
     counter = counter+1
   end
 
@@ -332,9 +335,10 @@ function build_data_dictionary_buffer(problem_object::ProblemObject)
 
     # get the mode name -
     mode_name = flux_mode_object.sentence_name
+    mode_comment = flux_mode_object.sentence_comment
 
     # start the reaction -
-    buffer *= "\t\t0.0\t;\t# Mode-$(index)\n"
+    buffer *= "\t\t0.0\t;\t# $(index) $(mode_comment)\n"
   end
   buffer *= "\t]\n"
 
@@ -347,11 +351,12 @@ function build_data_dictionary_buffer(problem_object::ProblemObject)
 
     # get the mode name -
     mode_name = flux_mode_object.sentence_name
+    mode_comment = flux_mode_object.sentence_comment
 
     # now .. go thru the species list -
     list_of_species_symbols::Array{String} = flux_mode_object.species_symbol_array
     for (species_index,species_symbol) in enumerate(list_of_species_symbols)
-      buffer *= "\t\t1.0\t;\t# $(index) $(mode_name) $(species_symbol) K[$(saturation_constant_counter)]\n"
+      buffer *= "\t\t1.0\t;\t# $(index) $(mode_name) $(species_symbol)::$(mode_comment)\n"
       saturation_constant_counter = saturation_constant_counter + 1
     end
   end

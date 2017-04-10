@@ -1,4 +1,4 @@
-M1,5,A_e
-M2,9,C_e
-M3,5,A_e,C_e
-M4,5,A_e
+M1,5,A_e --> B_e,A_e
+M2,9,C_e --> B_e,C_e
+M3,5,A_e + C_e --> 2.0*B_e,A_e,C_e
+M4,5,A_e --> C_e,A_e

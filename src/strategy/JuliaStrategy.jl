@@ -356,9 +356,10 @@ function build_data_dictionary_buffer(problem_object::ProblemObject)
     # now .. go thru the species list -
     list_of_species_symbols::Array{String} = flux_mode_object.species_symbol_array
     for (species_index,species_symbol) in enumerate(list_of_species_symbols)
-      buffer *= "\t\t1.0\t;\t# $(index) $(mode_name) $(species_symbol)::$(mode_comment)\n"
-      saturation_constant_counter = saturation_constant_counter + 1
+      buffer *= "\t\t1.0\t;\t# $(saturation_constant_counter) $(mode_name) $(species_symbol)::$(mode_comment)\n"
     end
+
+    saturation_constant_counter = saturation_constant_counter + 1
   end
   buffer *= "\t]\n"
 

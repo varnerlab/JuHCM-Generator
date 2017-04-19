@@ -5,7 +5,7 @@ function parse_commandline()
     settings_object = ArgParseSettings()
     @add_arg_table settings_object begin
       "-o"
-        help = "Directory where the Matlab model files will be written."
+        help = "Directory where the Julia HCM files will be written."
         arg_type = AbstractString
         default = "."
 
@@ -15,7 +15,7 @@ function parse_commandline()
         required = true
 
       "-m"
-        help = "Path to the flux model file written in the vff-mode format."
+        help = "Path to the flux mode file written in the vff-mode format."
         arg_type = AbstractString
         required = true
     end

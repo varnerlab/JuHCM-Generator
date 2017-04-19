@@ -21,35 +21,12 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 # ----------------------------------------------------------------------------------- #
-function Balances(time::Float64,state_array::Array{Float64,1},dxdt_vector::Array{Float64,1},data_dictionary::Dict{AbstractString,Any})
+function Dilution(time::Float64,state_array::Array{Float64,1},data_dictionary::Dict{AbstractString,Any})
 
-  # Correct for smalls -
-  idx = find(state_array.<1e-9)
-  state_array[idx] = 1e-9
+  # default implementation is to return zero (user can override) -
+  number_of_states = length(state_array)
+  dilution_rate_array = zeros(number_of_states)
 
-  # get parameters fron the data dictionary -
-  beta = data_dictionary["degradation_constant_array"]
-  mode_matrix = data_dictionary["flux_balance_modes_matrix"]
-  stoichiometric_matrix = data_dictionary["external_stoichiometric_matrix"]
-
-  # what is my system size?
-  (number_of_reactions,number_of_modes) = size(mode_matrix)
-
-  # Define rate vector
-  kinetic_rate_array = Kinetics(time,state_array,data_dictionary);
-
-  # Define the dilution/feed vector -
-  dilution_rate_array = Dilution(time,state_array,data_dictionary)
-
-  # calculate the control vector -
-  cybernetic_variable_array = Control(time,state_array,kinetic_rate_array,data_dictionary)
-
-  # correct the rates (rate*control) -
-  kinetic_rate_array = kinetic_rate_array.*cybernetic_variable_array;
-
-  # calculate the enzyme balances -
-  dxdt_vector[1:number_of_modes] = -(beta).*state_array[1:number_of_modes]+dilution_rate_array[1:number_of_modes]
-
-  # calculate the metabolic models -
-  dxdt_vector[(number_of_modes+1):end] = stoichiometric_matrix*mode_matrix*kinetic_rate_array+dilution_rate_array[(number_of_modes+1):end]
+  # return the dilution terms -
+  return dilution_rate_array
 end
